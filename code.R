@@ -1,6 +1,6 @@
 rm(list = ls())
 setwd('D:/coursera/reproducible//pa1/RepData_PeerAssessment1/')
-library(lubridate)
+library(ggplot2)
 
 #get data ready
 data <- read.csv('data/activity.csv')
@@ -49,3 +49,15 @@ hist(temp.res[,2],main = 'Histogram of steps taken each day',
 mean.new <- mean(temp.res[,2]) #10581.01
 median.new <- median(temp.res[,2]) #10395
 
+#weekdays and weekends plots
+weekend.set <- c('星期日', '星期六') #sun. sat in Chinese
+data.new$day.type <- ifelse(is.element(weekdays(data.new$date), weekend.set),
+                            'weekend','weekday')
+
+
+temp.res <- aggregate(data.new$steps, list(data.new$interval, data.new$day.type), mean)
+names(temp.res) <- c('interval', 'day.type', 'mean')
+
+q <- ggplot(data = temp.res, aes(x = as.integer(as.character(interval)), y = mean))
+qq <- q + geom_line(col = 'light blue', lwd = 1.25) + facet_grid(day.type ~ .) + theme_bw()
+qq + xlab('interval') + ylab('Numbers of steps')
